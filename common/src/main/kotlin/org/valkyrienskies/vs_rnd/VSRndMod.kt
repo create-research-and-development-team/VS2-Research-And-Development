@@ -5,6 +5,7 @@ object VSRndMod {
 
     @JvmStatic
     fun init() {
+        VSRndBlocks.register()
     }
 
     @JvmStatic
