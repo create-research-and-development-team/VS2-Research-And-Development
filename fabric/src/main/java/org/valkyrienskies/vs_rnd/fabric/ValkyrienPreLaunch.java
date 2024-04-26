@@ -1,4 +1,4 @@
-package io.github.techtastic.vs_addon_template.fabric;
+package org.valkyrienskies.vs_rnd.fabric;
 
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 

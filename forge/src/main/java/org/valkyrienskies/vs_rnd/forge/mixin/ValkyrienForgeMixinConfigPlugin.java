@@ -1,4 +1,4 @@
-package io.github.techtastic.vs_addon_template.forge.mixin;
+package org.valkyrienskies.vs_rnd.forge.mixin;
 
 import java.util.List;
 import java.util.Set;

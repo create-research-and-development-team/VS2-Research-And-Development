@@ -1,10 +1,8 @@
 {
   "required": true,
-  "package": "io.github.techtastic.vs_addon_template.fabric.mixin",
+  "package": "org.valkyrienskies.vs_rnd.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-  ],
-  "client": [
   ],
   "injectors": {
     "defaultRequire": 1

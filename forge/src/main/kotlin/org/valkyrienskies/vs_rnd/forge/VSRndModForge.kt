@@ -1,15 +1,15 @@
-package io.github.techtastic.vs_addon_template.forge
+package org.valkyrienskies.vs_rnd.forge
 
 import net.minecraftforge.eventbus.api.IEventBus
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent
-import io.github.techtastic.vs_addon_template.VSAddonTemplateMod
-import io.github.techtastic.vs_addon_template.VSAddonTemplateMod.init
-import io.github.techtastic.vs_addon_template.VSAddonTemplateMod.initClient
+import org.valkyrienskies.vs_rnd.VSRndMod
+import org.valkyrienskies.vs_rnd.VSRndMod.init
+import org.valkyrienskies.vs_rnd.VSRndMod.initClient
 import thedarkcolour.kotlinforforge.forge.MOD_BUS
 
-@Mod(VSAddonTemplateMod.MOD_ID)
-class VSAddonTemplateModForge {
+@Mod(VSRndMod.MOD_ID)
+class VSRndModForge {
     init {
         MOD_BUS.addListener { event: FMLClientSetupEvent? ->
             clientSetup(
