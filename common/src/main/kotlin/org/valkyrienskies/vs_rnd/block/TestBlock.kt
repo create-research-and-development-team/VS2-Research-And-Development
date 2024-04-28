@@ -1,9 +1,8 @@
 package org.valkyrienskies.vs_rnd.block
 
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec
+import dev.architectury.networking.NetworkManager
 import net.minecraft.core.BlockPos
-import net.minecraft.core.particles.ParticleTypes
-import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
@@ -14,11 +13,12 @@ import net.minecraft.world.phys.BlockHitResult
 import org.joml.Vector3d
 import org.joml.Vector3i
 import org.valkyrienskies.core.api.ships.LoadedServerShip
-import org.valkyrienskies.core.api.ships.ServerShip
 import org.valkyrienskies.core.api.ships.datastructures.ShipConnDataAttachment
 import org.valkyrienskies.core.api.ships.getAttachment
 import org.valkyrienskies.mod.common.getShipManagingPos
 import org.valkyrienskies.mod.common.shipObjectWorld
+import org.valkyrienskies.vs_rnd.VSRndPackets
+import org.valkyrienskies.vs_rnd.networking.TestBlockPacket
 
 
 class TestBlock(properties: Properties) : Block(properties) {
@@ -42,21 +42,26 @@ class TestBlock(properties: Properties) : Block(properties) {
         val offsets = arrayListOf(Vector3i(1,0,0),Vector3i(-1,0,0),Vector3i(0,1,0),Vector3i(0,-1,0),Vector3i(0,0,1),Vector3i(0,0,-1))
 
         val walls = mutableListOf<Vector3i>()
+        val innards = arrayListOf<Vector3d>()
+
         pocket.pocket.forEach { (apos, vertex) ->
             val wpos = shipThisIsIn.transform.shipToWorld.transformPosition(Vector3d(apos.x().toDouble(),apos.y().toDouble(),apos.z().toDouble()))
             println(wpos)
-            
+
             offsets.forEach { offset ->
                 val opos = Vector3i(0,0,0)
                 apos.add(offset,opos)
 
-                if (pocket.pocket.get(opos)==null) walls.add(opos)
+                if (pocket.pocket[opos] ==null) walls.add(opos)
             }
+
+            innards.add(shipThisIsIn.transform.shipToWorld.transformPosition(Vector3d(apos.x().toDouble(),apos.y().toDouble(),apos.z().toDouble())))
         }
         walls.forEach { p ->
             //println(level.getBlockState(BlockPos(p.x,p.y,p.z)).block.name)
             //println(shipThisIsIn.transform.shipToWorld.transformPosition(Vector3d(p.x.toDouble(),p.y.toDouble(),p.z.toDouble())))
         }
+        VSRndPackets.CHANNEL.sendToPlayer<TestBlockPacket>(player as ServerPlayer, TestBlockPacket(innards))
 
         return InteractionResult.SUCCESS
     }
