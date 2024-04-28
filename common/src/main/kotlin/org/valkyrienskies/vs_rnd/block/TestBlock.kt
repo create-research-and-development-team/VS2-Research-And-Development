@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.BlockHitResult
 import org.joml.Vector3i
 import org.valkyrienskies.core.api.ships.ServerShip
+import org.valkyrienskies.core.api.ships.datastructures.ShipConnDataAttachment
 import org.valkyrienskies.core.api.ships.getAttachment
 import org.valkyrienskies.core.impl.datastructures.ShipConnDataAttachmentImpl
 import org.valkyrienskies.mod.common.getShipManagingPos
@@ -27,9 +28,11 @@ class TestBlock(properties: Properties) : Block(properties) {
     ): InteractionResult {
 
 
-        if (level.isClientSide) return InteractionResult.FAIL
+        if (level.isClientSide) return InteractionResult.SUCCESS
         val shipThisIsIn = level.getShipManagingPos(pos) as ServerShip
+        println(shipThisIsIn)
         val pocket = shipThisIsIn.getAttachment<ShipConnDataAttachmentImpl>()?.getAirPocketIdFromPoint(Vector3i(pos.x,pos.y,pos.z))
+        println(shipThisIsIn.getAttachment<ShipConnDataAttachmentImpl>())
         println(pocket)
 
         return InteractionResult.SUCCESS
