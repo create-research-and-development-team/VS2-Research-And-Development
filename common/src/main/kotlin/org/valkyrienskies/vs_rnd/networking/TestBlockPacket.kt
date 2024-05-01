@@ -16,9 +16,10 @@ class TestBlockPacket() {
     constructor(list:ArrayList<Vector3d>) : this() {
         this.lpos = list
     }
+
     constructor(buf: FriendlyByteBuf) : this() {
         val size = buf.readInt()
-        for (i in 0..size) {
+        for (i in 1..size) {
             lpos.add(Vector3d(buf.readDouble(),buf.readDouble(),buf.readDouble()))
         }
 
@@ -33,7 +34,7 @@ class TestBlockPacket() {
     fun apply(contextSupplier: Supplier<NetworkManager.PacketContext?>) {
 
         lpos.forEach { v->
-            Minecraft.getInstance().level?.addParticle(ParticleTypes.DRAGON_BREATH,v.x,v.y,v.z,0.0,0.0,0.0)
+            Minecraft.getInstance().level?.addParticle(ParticleTypes.DRAGON_BREATH,v.x+0.5,v.y+0.5,v.z+0.5,0.0,0.0,0.0)
 
         }
 
