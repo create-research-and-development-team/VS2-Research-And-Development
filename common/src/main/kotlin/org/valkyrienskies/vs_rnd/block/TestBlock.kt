@@ -38,7 +38,6 @@ class TestBlock(properties: Properties) : BaseEntityBlock(properties) {
         hand: InteractionHand,
         hit: BlockHitResult
     ): InteractionResult {
-        println(level.getBlockEntity(pos) as TestBlockEntity)
         val be = level.getBlockEntity(pos) as TestBlockEntity? ?: return InteractionResult.FAIL
         return be.use(state,level,pos,player,hand,hit)
 
