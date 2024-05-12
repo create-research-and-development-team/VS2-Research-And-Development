@@ -21,6 +21,9 @@ import org.valkyrienskies.core.api.ships.ServerShip
 import org.valkyrienskies.core.api.ships.datastructures.ShipConnDataAttachment
 import org.valkyrienskies.core.api.ships.getAttachment
 import org.valkyrienskies.core.impl.hooks.VSEvents
+import org.valkyrienskies.core.util.x
+import org.valkyrienskies.core.util.y
+import org.valkyrienskies.core.util.z
 import org.valkyrienskies.mod.common.getShipManagingPos
 import org.valkyrienskies.mod.common.shipObjectWorld
 import org.valkyrienskies.vs_rnd.VSRndBlockEntities
@@ -39,6 +42,7 @@ class TestBlockEntity(pos: BlockPos, blockState: BlockState) : BlockEntity(VSRnd
         Vector3i(0,0,-1)
     )
 
+
     var airPocket: HashMap<Vector3ic,BlockPosVertex> = HashMap()
 
     init {
@@ -47,7 +51,9 @@ class TestBlockEntity(pos: BlockPos, blockState: BlockState) : BlockEntity(VSRnd
                 (shipId, airPocketId, removed), handler ->
                 if (!level!!.isClientSide) { // block entity level can apparently be client sided?
                     val slevel = level as ServerLevel
-                    val ship = slevel.shipObjectWorld.loadedShips.getById(shipId) as LoadedServerShip?
+                    val ship = slevel.getShipManagingPos(this.blockPos)
+                    println(ship!!.id)
+                    println(shipId)
                     if (ship != null && ship.id == shipId) {
                         val ap = ship.getAttachment<ShipConnDataAttachment>()?.getAirPocket(airPocketId)
                         print("AP: ")
@@ -59,33 +65,26 @@ class TestBlockEntity(pos: BlockPos, blockState: BlockState) : BlockEntity(VSRnd
                         if (ap != null) {
 
 
-                            var mine = false
-                            ap.pocket.forEach { (v, _) ->
-                                if (v == Vector3i(pos.x, pos.y + 1, pos.z)) {
-                                    mine = true
-
-                                }
-                            }
-                            if (mine) {
-                                airPocket = ap.pocket
-
-                                val innards = arrayListOf<Vector3d>()
-
-                                airPocket.forEach { (apos, _) ->
-                                    val wpos = ship.transform.shipToWorld.transformPosition(Vector3d(apos.x().toDouble(),apos.y().toDouble(),apos.z().toDouble()))
-                                    println(wpos)
-
-                                    offsets.forEach { offset ->
-                                        val opos = Vector3i(0,0,0)
-                                        apos.add(offset,opos)
 
 
+
+                            if (ap.pocket.any { (v, _) -> (v.x == pos.x && v.y == pos.y + 1 && v.z == pos.z) }) {
+
+                                if (removed) airPocket = HashMap()
+                                else {
+                                    airPocket = ap.pocket
+
+                                    val innards = arrayListOf<Vector3d>()
+
+                                    airPocket.forEach { (apos, _) ->
+                                        val wpos = ship.transform.shipToWorld.transformPosition(Vector3d(apos.x().toDouble(),apos.y().toDouble(),apos.z().toDouble()))
+                                        println(wpos)
+
+                                        innards.add(ship.transform.shipToWorld.transformPosition(Vector3d(apos.x().toDouble(),apos.y().toDouble(),apos.z().toDouble())))
                                     }
 
-                                    innards.add(ship.transform.shipToWorld.transformPosition(Vector3d(apos.x().toDouble(),apos.y().toDouble(),apos.z().toDouble())))
+                                    if (player!=null) VSRndPackets.CHANNEL.sendToPlayer<TestBlockPacket>(player as ServerPlayer, TestBlockPacket(innards))
                                 }
-
-                                if (player!=null) VSRndPackets.CHANNEL.sendToPlayer<TestBlockPacket>(player as ServerPlayer, TestBlockPacket(innards))
                             }
 
                         }
@@ -119,6 +118,7 @@ class TestBlockEntity(pos: BlockPos, blockState: BlockState) : BlockEntity(VSRnd
         hit: BlockHitResult
     ): InteractionResult {
         this.player = player
+
         if (level.isClientSide) return InteractionResult.FAIL
 
         val shipId = level.getShipManagingPos(pos)?.id ?: return InteractionResult.FAIL
